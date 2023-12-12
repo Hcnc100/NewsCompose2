@@ -5,7 +5,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface NewsRepository {
 
-    suspend fun requestNewNews()
+    suspend fun requestNewNews(): Int
 
-    fun getListNewsCache():Flow<List<NewsData>>
+    suspend fun concatenateNews(): Int
+
+    fun getListNewsCache(): Flow<List<NewsData>>
 }

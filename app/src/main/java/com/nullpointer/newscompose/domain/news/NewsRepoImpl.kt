@@ -9,9 +9,20 @@ class NewsRepoImpl(
     private val newsRemoteDataSource: NewsRemoteDataSource,
     private val newsLocalDataSource: NewsLocalDataSource
 ) : NewsRepository {
-    override suspend fun requestNewNews() {
-        val newListNews= newsRemoteDataSource.getListNews()
+
+    private var currentPage = 1
+    override suspend fun requestNewNews(): Int {
+        currentPage = 1
+        val newListNews = newsRemoteDataSource.getListNews(currentPage)
         newsLocalDataSource.updateAllNews(newListNews)
+        return newListNews.size
+    }
+
+    override suspend fun concatenateNews(): Int {
+        currentPage++
+        val listNews = newsRemoteDataSource.getListNews(currentPage)
+        newsLocalDataSource.addNews(listNews)
+        return listNews.size
     }
 
     override fun getListNewsCache(): Flow<List<NewsData>> =

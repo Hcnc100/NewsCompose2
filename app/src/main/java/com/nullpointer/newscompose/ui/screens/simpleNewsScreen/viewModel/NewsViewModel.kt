@@ -12,29 +12,25 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+
 @HiltViewModel
 class NewsViewModel @Inject constructor(
     private val newsRepository: NewsRepository
 ) : ViewModel() {
 
-    var isInit by mutableStateOf(false)
+    var newsState by mutableStateOf(NewsState())
         private set
 
-    var isLoading by mutableStateOf(false)
-        private set
-
-    val _message= Channel<String>()
-    val message= _message.receiveAsFlow()
+    private val _message = Channel<String>()
+    val message = _message.receiveAsFlow()
 
     val newsList = newsRepository.getListNewsCache()
-        .onStart { delay(1500) }
         .flowOn(Dispatchers.IO)
         .stateIn(
             viewModelScope,
@@ -42,23 +38,44 @@ class NewsViewModel @Inject constructor(
             null,
         )
 
-    fun requestAllNews()=viewModelScope.launch {
-        isLoading=true
+    fun requestAllNews() {
+        if (newsState.isLoading) return
+        viewModelScope.launch {
+            newsState = newsState.copy(isLoading = true)
 
-        runCatching {
-            withContext(Dispatchers.IO){
-                newsRepository.requestNewNews()
+            runCatching {
+                val countNews = withContext(Dispatchers.IO) {
+                    newsRepository.requestNewNews()
+                }
+                newsState = newsState.copy(isConcatenateEnable = countNews != 0)
+            }.onSuccess {
+                if (!newsState.isInit) {
+                    newsState = newsState.copy(isInit = true)
+                }
+            }.onFailure {
+                _message.send(it.message.toString())
+                print(it.message.toString())
             }
-        }.onSuccess {
-            if(!isInit){
-                isInit=true
-            }
-        }.onFailure {
-            _message.send(it.message.toString())
-            print(it.message.toString())
+
+            newsState = newsState.copy(isLoading = false)
+
         }
+    }
 
-        isLoading=false
-
+    fun concatenateNews() {
+        if (!newsState.canConcatenate) return
+        viewModelScope.launch {
+            newsState = newsState.copy(isConcatenate = true)
+            runCatching {
+                val countNews = withContext(Dispatchers.IO) {
+                    delay(1500)
+                    newsRepository.concatenateNews()
+                }
+                newsState = newsState.copy(isConcatenateEnable = countNews != 0)
+            }.onFailure {
+                _message.send(it.message.toString())
+            }
+            newsState = newsState.copy(isConcatenate = false)
+        }
     }
 }

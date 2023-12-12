@@ -14,8 +14,13 @@ class NewsLocalDataSourceImpl(
             listNews.map(NewsData::fromNewsEntity)
         }
 
-    override suspend fun updateAllNews(listNews: List<NewsData>){
-        val listNewsEntity= listNews.map(NewsEntity::fromNewData)
+    override suspend fun updateAllNews(listNews: List<NewsData>) {
+        val listNewsEntity = listNews.map(NewsEntity::fromNewData)
         newsCacheDAO.updateAllNews(listNewsEntity)
+    }
+
+    override suspend fun addNews(listNews: List<NewsData>) {
+        val listNewsEntity = listNews.map(NewsEntity::fromNewData)
+        newsCacheDAO.addAllNews(listNewsEntity)
     }
 }

@@ -14,13 +14,15 @@ class NewsRemoteDataSourceImpl(
     private val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).apply{
         timeZone = TimeZone.getTimeZone("UTC")
     }
-    override suspend fun getListNews(): List<NewsData> {
+    override suspend fun getListNews(page: Int): List<NewsData> {
         val response = newsApiServices.getListNews(
             apiKey = BuildConfig.NEWS_API_KEY,
-            country = "us"
+            country = "us",
+            page = page,
+            pageSize = 5
         )
-        return response.articles?.map{
+        return response.articles?.map {
             NewsData.fromArticleResponse(it, format)
-        } ?: emptyList()
+        }?.filter { it.url != "https://removed.com" } ?: emptyList()
     }
 }
