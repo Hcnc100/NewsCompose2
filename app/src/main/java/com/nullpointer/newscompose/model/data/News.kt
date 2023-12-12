@@ -2,6 +2,8 @@ package com.nullpointer.newscompose.model.data
 
 import com.nullpointer.newscompose.model.api.news.Article
 import com.nullpointer.newscompose.model.entity.NewsEntity
+import java.text.SimpleDateFormat
+import java.util.TimeZone
 import java.util.UUID
 
 data class NewsData(
@@ -24,12 +26,18 @@ data class NewsData(
             )
         }
 
-        fun fromArticleResponse(article: Article):NewsData{
+
+
+        fun fromArticleResponse(article: Article, simpleDateFormat: SimpleDateFormat):NewsData{
+            val date = simpleDateFormat.parse(article.publishedAt)
+            val timeInMillis= date?.time ?: 0
+
             val uuidBites= article.url?.toByteArray()
             val uuid= UUID.nameUUIDFromBytes(uuidBites).toString()
+
             return  NewsData(
                 newsId = uuid,
-                dateTime = System.currentTimeMillis(),
+                dateTime = timeInMillis,
                 title =  article.title?:"",
                 imageUrl =  article.urlToImage,
                 description =  article.description?: "[Without Description]",

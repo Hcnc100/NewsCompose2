@@ -88,18 +88,15 @@ fun NewsListComposable(
     pullRefreshState: PullRefreshState,
     modifier: Modifier
 ) {
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+    Box(
+        modifier = modifier.then(
+            if (newsList.isNullOrEmpty()) Modifier.verticalScroll(rememberScrollState()) else Modifier
+        ),
+        contentAlignment = Alignment.Center,
+    ) {
         when {
             newsList==null && isLoading -> CircularProgressIndicator()
-            newsList.isNullOrEmpty() -> Box(modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(
-                    rememberScrollState()
-                ),
-                contentAlignment =  Alignment.Center
-            ){
-                Text(text = "No have news")
-            }
+            newsList.isNullOrEmpty() -> Text(text = "No have news")
             else ->
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -107,18 +104,19 @@ fun NewsListComposable(
                         .padding(horizontal = 10.dp)
                         .padding(top = 10.dp)
                 ) {
-                    items(newsList) { news ->
+                    items(newsList, key = {it.newsId}) { news ->
                         NewsItem(newsItem = news)
                     }
                 }
-
-
         }
 
-        PullRefreshIndicator(
-            refreshing = isLoading,
-            state = pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
+        if(!newsList.isNullOrEmpty()){
+            PullRefreshIndicator(
+                refreshing = isLoading,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+        }
+
     }
 }
