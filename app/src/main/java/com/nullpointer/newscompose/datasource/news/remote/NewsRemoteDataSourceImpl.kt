@@ -1,6 +1,7 @@
 package com.nullpointer.newscompose.datasource.news.remote
 
 import com.nullpointer.newscompose.BuildConfig
+import com.nullpointer.newscompose.constants.NewsConstants
 import com.nullpointer.newscompose.data.news.remote.NewsApiServices
 import com.nullpointer.newscompose.model.data.NewsData
 import java.text.SimpleDateFormat
@@ -16,13 +17,13 @@ class NewsRemoteDataSourceImpl(
     }
     override suspend fun getListNews(page: Int): List<NewsData> {
         val response = newsApiServices.getListNews(
-            apiKey = BuildConfig.NEWS_API_KEY,
-            country = "us",
             page = page,
-            pageSize = 5
+            apiKey = BuildConfig.NEWS_API_KEY,
+            country = NewsConstants.countryNews,
+            pageSize = NewsConstants.newsPageSize
         )
         return response.articles?.map {
             NewsData.fromArticleResponse(it, format)
-        }?.filter { it.url != "https://removed.com" } ?: emptyList()
+        }?.filter { it.url != NewsConstants.urlInvalidNews } ?: emptyList()
     }
 }
