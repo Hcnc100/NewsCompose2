@@ -2,7 +2,9 @@ package com.nullpointer.newscompose.ui.screens.simpleNewsScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -102,11 +104,15 @@ fun NewsListComposable(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
-                        .padding(top = 10.dp)
                 ) {
-                    items(newsList, key = {it.newsId}) { news ->
+
+                    item(contentType = "spacer") { Spacer(modifier = Modifier.height(10.dp)) }
+
+                    items(newsList, key = {it.newsId}, contentType = {"New"}) { news ->
                         NewsItem(newsItem = news)
                     }
+
+                    item(contentType = "spacer") { Spacer(modifier = Modifier.height(10.dp)) }
                 }
         }
 

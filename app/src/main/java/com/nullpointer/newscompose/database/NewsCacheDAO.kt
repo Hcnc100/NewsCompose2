@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NewsCacheDAO {
 
-    @Query("SELECT * FROM news ORDER BY dateCreate DESC")
+    @Query("SELECT * FROM news")
     fun getNewsListFlow():Flow<List<NewsEntity>>
 
     @Query("DELETE FROM news")
