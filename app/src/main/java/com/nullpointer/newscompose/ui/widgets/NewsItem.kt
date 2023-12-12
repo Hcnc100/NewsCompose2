@@ -1,4 +1,4 @@
-package com.nullpointer.newscompose.ui.screens.simpleNewsScreen.composables
+package com.nullpointer.newscompose.ui.widgets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Shapes
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,13 +18,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.nullpointer.newscompose.model.data.NewsData
+import com.valentinilk.shimmer.Shimmer
+import com.valentinilk.shimmer.shimmer
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NewsItem(
     newsItem: NewsData,
-    modifier: Modifier=Modifier
+    modifier: Modifier = Modifier
 ) {
 
     Card(onClick = { /*TODO*/ }, shape = RoundedCornerShape(10.dp), modifier = modifier) {
@@ -52,5 +53,28 @@ fun NewsItem(
                     .padding(5.dp)
             )
         }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun NewItemShimmer(
+    modifier: Modifier = Modifier,
+    shimmer: Shimmer
+) {
+    Card(
+        onClick = { /*TODO*/ },
+        shape = RoundedCornerShape(10.dp),
+        modifier = modifier.shimmer(shimmer),
+    ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .background(Color.Gray)
+                .shimmer(),
+        )
+
     }
 }

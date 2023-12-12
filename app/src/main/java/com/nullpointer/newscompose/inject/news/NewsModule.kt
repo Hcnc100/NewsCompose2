@@ -3,6 +3,7 @@ package com.nullpointer.newscompose.inject.news
 import com.nullpointer.newscompose.data.news.remote.NewsApiServices
 import com.nullpointer.newscompose.database.NewsCacheDAO
 import com.nullpointer.newscompose.database.NewsDatabase
+import com.nullpointer.newscompose.database.RemoteKeysDAO
 import com.nullpointer.newscompose.datasource.news.local.NewsLocalDataSource
 import com.nullpointer.newscompose.datasource.news.local.NewsLocalDataSourceImpl
 import com.nullpointer.newscompose.datasource.news.remote.NewsRemoteDataSource
@@ -43,8 +44,12 @@ object NewsModule {
     @Provides
     @Singleton
     fun provideNewsLocalDataSource(
-        newsCacheDAO: NewsCacheDAO
-    ):NewsLocalDataSource=NewsLocalDataSourceImpl(newsCacheDAO)
+        newsCacheDAO: NewsCacheDAO,
+        remoteKeysDAO: RemoteKeysDAO
+    ): NewsLocalDataSource = NewsLocalDataSourceImpl(
+        newsCacheDAO = newsCacheDAO,
+        remoteKeysDAO = remoteKeysDAO
+    )
 
     @Provides
     @Singleton

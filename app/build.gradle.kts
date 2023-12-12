@@ -109,9 +109,18 @@ dependencies {
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$roomVersion")
 
+    // * pagination
+    val pagingVersion = "3.2.1"
+    implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
+    implementation("androidx.paging:paging-compose:3.2.1")
+    implementation("androidx.room:room-paging:$roomVersion")
+
 
     // * coil
     implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // * shimmer
+    implementation("com.valentinilk.shimmer:compose-shimmer:1.2.0")
 }
 
 kapt {

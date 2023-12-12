@@ -1,8 +1,10 @@
 package com.nullpointer.newscompose.domain.news
 
+import androidx.paging.PagingSource
 import com.nullpointer.newscompose.datasource.news.local.NewsLocalDataSource
 import com.nullpointer.newscompose.datasource.news.remote.NewsRemoteDataSource
 import com.nullpointer.newscompose.model.data.NewsData
+import com.nullpointer.newscompose.model.entity.NewsEntity
 import kotlinx.coroutines.flow.Flow
 
 class NewsRepoImpl(
@@ -27,4 +29,7 @@ class NewsRepoImpl(
 
     override fun getListNewsCache(): Flow<List<NewsData>> =
         newsLocalDataSource.getNewsListCache()
+
+    override fun getNewsPageSource(): PagingSource<Int, NewsEntity> =
+        newsLocalDataSource.getNewsPageSource()
 }

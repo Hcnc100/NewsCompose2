@@ -7,17 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
@@ -40,13 +36,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nullpointer.newscompose.model.data.NewsData
-import com.nullpointer.newscompose.ui.screens.simpleNewsScreen.composables.NewsItem
 import com.nullpointer.newscompose.ui.screens.simpleNewsScreen.viewModel.NewsViewModel
+import com.nullpointer.newscompose.ui.widgets.ConcatenateIndicator
+import com.nullpointer.newscompose.ui.widgets.NewsItem
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NewsScreen(
+fun SimpleNewsScreen(
     newsViewModel: NewsViewModel = viewModel(),
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     lazyListState: LazyListState = rememberLazyListState()
@@ -180,22 +177,3 @@ fun ListNews(
 }
 
 
-@Composable
-fun ConcatenateIndicator() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            elevation = 10.dp,
-            modifier = Modifier,
-            shape = CircleShape
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.padding(5.dp)
-            )
-        }
-    }
-}

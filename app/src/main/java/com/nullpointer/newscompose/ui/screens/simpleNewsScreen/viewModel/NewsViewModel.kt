@@ -5,13 +5,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.nullpointer.newscompose.domain.news.NewsRepository
+import com.nullpointer.newscompose.model.data.NewsData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -37,6 +45,22 @@ class NewsViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             null,
         )
+
+    val newsListPaging = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = true,
+            prefetchDistance = 5,
+        ),
+        pagingSourceFactory = {
+            newsRepository.getNewsPageSource()
+        }
+    ).flow.catch {
+        emit(PagingData.empty())
+        print(it)
+    }.map { pagingData ->
+        pagingData.map(NewsData::fromNewsEntity)
+    }.flowOn(Dispatchers.IO).cachedIn(viewModelScope)
 
     fun requestAllNews() {
         if (newsState.isLoading) return
