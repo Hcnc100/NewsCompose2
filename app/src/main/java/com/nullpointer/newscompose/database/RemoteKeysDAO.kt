@@ -17,11 +17,14 @@ interface RemoteKeysDAO {
     suspend fun deleterAllKeys()
 
     @Query("SELECT * from remote_keys_news WHERE newsId = (:newsId)")
-    suspend fun getRemoteKeyByNews(newsId: Int): RemoteKeysNews
+    suspend fun getRemoteKeyByNews(newsId: String): RemoteKeysNews
 
     @Transaction
     suspend fun updateAllKeys(keysList: List<RemoteKeysNews>) {
         deleterAllKeys()
         insertAllKeys(keysList)
     }
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addAllKeys(newsRemoteKeysList: List<RemoteKeysNews>)
 }

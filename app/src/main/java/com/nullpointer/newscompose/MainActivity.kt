@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import com.nullpointer.newscompose.ui.screens.roomNewsScreen.RoomNewsScreen
+import com.nullpointer.newscompose.ui.screens.mediatorNewsScreen.MediatorNewsScreen
 import com.nullpointer.newscompose.ui.theme.NewsComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    RoomNewsScreen()
+                    MediatorNewsScreen()
                 }
             }
         }

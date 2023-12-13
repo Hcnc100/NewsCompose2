@@ -32,4 +32,11 @@ class NewsRepoImpl(
 
     override fun getNewsPageSource(): PagingSource<Int, NewsEntity> =
         newsLocalDataSource.getNewsPageSource()
+
+    override fun getNewsRemoteMediator(): NewsRemoteMediator {
+        return NewsRemoteMediator(
+            newsRemoteDataSource = newsRemoteDataSource,
+            newsLocalDataSource = newsLocalDataSource
+        )
+    }
 }

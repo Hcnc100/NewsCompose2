@@ -14,4 +14,6 @@ interface NewsRepository {
     fun getListNewsCache(): Flow<List<NewsData>>
 
     fun getNewsPageSource(): PagingSource<Int, NewsEntity>
+
+    fun getNewsRemoteMediator(): NewsRemoteMediator
 }

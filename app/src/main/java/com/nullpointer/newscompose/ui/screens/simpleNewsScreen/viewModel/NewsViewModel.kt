@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -27,6 +28,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
+@OptIn(ExperimentalPagingApi::class)
 @HiltViewModel
 class NewsViewModel @Inject constructor(
     private val newsRepository: NewsRepository
@@ -40,24 +42,43 @@ class NewsViewModel @Inject constructor(
 
     val newsList = newsRepository.getListNewsCache()
         .flowOn(Dispatchers.IO)
+        .catch {
+            emit(emptyList())
+            _message.trySend(it.toString())
+        }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             null,
         )
 
-    val newsListPaging = Pager(
+    val newsListPagingRoom = Pager(
         config = PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = false,
+            prefetchDistance = 5,
+        ),
+        pagingSourceFactory = newsRepository::getNewsPageSource
+    ).flow.catch {
+        emit(PagingData.empty())
+        _message.trySend(it.toString())
+    }.map { pagingData ->
+        pagingData.map(NewsData::fromNewsEntity)
+    }.flowOn(Dispatchers.IO).cachedIn(viewModelScope)
+
+
+    val newsListPagingMediator = Pager(
+        config = PagingConfig(
+            initialLoadSize = 10,
             pageSize = 10,
             enablePlaceholders = true,
             prefetchDistance = 5,
         ),
-        pagingSourceFactory = {
-            newsRepository.getNewsPageSource()
-        }
+        pagingSourceFactory = newsRepository::getNewsPageSource,
+        remoteMediator = newsRepository.getNewsRemoteMediator(),
     ).flow.catch {
         emit(PagingData.empty())
-        print(it)
+        _message.trySend(it.toString())
     }.map { pagingData ->
         pagingData.map(NewsData::fromNewsEntity)
     }.flowOn(Dispatchers.IO).cachedIn(viewModelScope)
