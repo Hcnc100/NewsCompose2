@@ -1,18 +1,11 @@
 package com.nullpointer.newscompose.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColors(
     primary = Purple80,
@@ -36,16 +29,21 @@ private val LightColorScheme = lightColors(
     */
 )
 
+private val NewsColorsScheme = lightColors(
+    primary = Primary,
+    secondary = Secondary,
+    primaryVariant = PrimaryVariant,
+    secondaryVariant = SecondaryVariant
+)
+
 @Composable
 fun NewsComposeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
 
     MaterialTheme(
-        colors = LightColorScheme,
+        colors = NewsColorsScheme,
         typography = Typography,
         content = content
     )

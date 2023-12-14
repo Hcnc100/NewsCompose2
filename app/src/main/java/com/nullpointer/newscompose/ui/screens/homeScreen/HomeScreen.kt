@@ -88,6 +88,9 @@ fun HomeBottomNavDestination(
     BottomAppBar {
         DestinationsItems.HomeDestinationsItems.listScreens.map {
             BottomNavigationItem(
+
+                alwaysShowLabel = false,
+                label = { Text(text = it.title) },
                 selected = it.destination == currentDestination,
                 onClick = {
                     navController.navigate(it.destination) {

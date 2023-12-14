@@ -132,6 +132,9 @@ dependencies {
     val destinationsVersion = "1.8.42-beta"
     implementation("io.github.raamcosta.compose-destinations:core:$destinationsVersion")
     ksp("io.github.raamcosta.compose-destinations:ksp:$destinationsVersion")
+
+    // * splash
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }
 
 kapt {
