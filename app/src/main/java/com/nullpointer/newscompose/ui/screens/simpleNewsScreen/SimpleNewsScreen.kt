@@ -17,14 +17,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,24 +31,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nullpointer.newscompose.model.data.NewsData
+import com.nullpointer.newscompose.navigation.graphs.HomeNavGraph
 import com.nullpointer.newscompose.ui.screens.simpleNewsScreen.viewModel.NewsViewModel
 import com.nullpointer.newscompose.ui.widgets.ConcatenateIndicator
 import com.nullpointer.newscompose.ui.widgets.NewsItem
+import com.ramcosta.composedestinations.annotation.Destination
 
 
 @OptIn(ExperimentalMaterialApi::class)
+@Destination
+@HomeNavGraph(start = true)
 @Composable
 fun SimpleNewsScreen(
-    newsViewModel: NewsViewModel = viewModel(),
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    newsViewModel: NewsViewModel,
     lazyListState: LazyListState = rememberLazyListState()
 ) {
 
-
     val newsList by newsViewModel.newsList.collectAsState()
-    val (isInitViewModel, isLoading, isConcatenate) = newsViewModel.newsState
+    val (_, isLoading, isConcatenate) = newsViewModel.newsState
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isLoading,
@@ -74,24 +72,7 @@ fun SimpleNewsScreen(
         }
     }
 
-
-    LaunchedEffect(key1 = Unit) {
-        if (!isInitViewModel) {
-            newsViewModel.requestAllNews()
-        }
-    }
-
-    LaunchedEffect(key1 = Unit) {
-        newsViewModel.message.collect {
-            scaffoldState.snackbarHostState.showSnackbar(it)
-        }
-    }
-
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = { TopAppBar(title = { Text(text = "News Simple") }) }
-    ) {
-
+    Scaffold {
         NewsListComposable(
             isLoading = isLoading,
             newsList = newsList,

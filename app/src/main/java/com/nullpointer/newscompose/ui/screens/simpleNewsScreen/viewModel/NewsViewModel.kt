@@ -16,11 +16,11 @@ import com.nullpointer.newscompose.model.data.NewsData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -41,6 +41,7 @@ class NewsViewModel @Inject constructor(
     val message = _message.receiveAsFlow()
 
     val newsList = newsRepository.getListNewsCache()
+        .onStart { 1500 }
         .flowOn(Dispatchers.IO)
         .catch {
             emit(emptyList())
@@ -87,7 +88,6 @@ class NewsViewModel @Inject constructor(
         if (newsState.isLoading) return
         viewModelScope.launch {
             newsState = newsState.copy(isLoading = true)
-
             runCatching {
                 val countNews = withContext(Dispatchers.IO) {
                     newsRepository.requestNewNews()
@@ -113,7 +113,6 @@ class NewsViewModel @Inject constructor(
             newsState = newsState.copy(isConcatenate = true)
             runCatching {
                 val countNews = withContext(Dispatchers.IO) {
-                    delay(1500)
                     newsRepository.concatenateNews()
                 }
                 newsState = newsState.copy(isConcatenateEnable = countNews != 0)

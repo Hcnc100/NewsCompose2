@@ -6,9 +6,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.nullpointer.newscompose.ui.screens.mediatorNewsScreen.MediatorNewsScreen
+import androidx.navigation.compose.rememberNavController
+import com.nullpointer.newscompose.navigation.interfaces.ActionsRootNavigation
+import com.nullpointer.newscompose.ui.screens.NavGraphs
 import com.nullpointer.newscompose.ui.theme.NewsComposeTheme
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.navigation.dependency
+import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,7 +28,19 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MediatorNewsScreen()
+                    val navController = rememberNavController()
+                    val actionsRootNavigation = remember(navController) {
+                        ActionsRootNavigation { direction -> navController.navigate(direction) }
+                    }
+
+
+                    DestinationsNavHost(
+                        navGraph = NavGraphs.root,
+                        navController = navController,
+                        dependenciesContainerBuilder = {
+                            dependency(actionsRootNavigation)
+                        }
+                    )
                 }
             }
         }

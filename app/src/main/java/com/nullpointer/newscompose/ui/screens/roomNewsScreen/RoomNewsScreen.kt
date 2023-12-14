@@ -16,13 +16,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -31,32 +29,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.nullpointer.newscompose.model.data.NewsData
+import com.nullpointer.newscompose.navigation.graphs.HomeNavGraph
 import com.nullpointer.newscompose.ui.screens.simpleNewsScreen.viewModel.NewsViewModel
 import com.nullpointer.newscompose.ui.widgets.ConcatenateIndicator
 import com.nullpointer.newscompose.ui.widgets.NewItemShimmer
 import com.nullpointer.newscompose.ui.widgets.NewsItem
+import com.ramcosta.composedestinations.annotation.Destination
 import com.valentinilk.shimmer.ShimmerBounds
 import com.valentinilk.shimmer.rememberShimmer
 
 
 @OptIn(ExperimentalMaterialApi::class)
+@Destination
+@HomeNavGraph
 @Composable
 fun RoomNewsScreen(
-    newsViewModel: NewsViewModel = viewModel(),
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    newsViewModel: NewsViewModel,
     lazyListState: LazyListState = rememberLazyListState()
 ) {
 
     val newsListPaging = newsViewModel.newsListPagingRoom.collectAsLazyPagingItems()
 
-    val (isInit, isLoading, isConcatenate) = newsViewModel.newsState
+    val (_, isLoading, isConcatenate) = newsViewModel.newsState
+
     val refreshState = rememberPullRefreshState(
         refreshing = isLoading,
         onRefresh = newsViewModel::requestAllNews
@@ -76,15 +77,7 @@ fun RoomNewsScreen(
         }
     }
 
-    LaunchedEffect(key1 = Unit) {
-        if (!isInit) {
-            newsViewModel.requestAllNews()
-        }
-    }
-
-    Scaffold(
-        scaffoldState = scaffoldState
-    ) {
+    Scaffold {
 
         ContainerPadding(
             isLoading = isLoading,

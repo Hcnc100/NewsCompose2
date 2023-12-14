@@ -67,6 +67,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    applicationVariants.all {
+        addJavaSourceFoldersToModel(
+            File(buildDir, "generated/ksp/$name/kotlin")
+        )
+    }
 }
 
 dependencies {
@@ -122,6 +127,11 @@ dependencies {
 
     // * shimmer
     implementation("com.valentinilk.shimmer:compose-shimmer:1.2.0")
+
+    // * navigation
+    val destinationsVersion = "1.8.42-beta"
+    implementation("io.github.raamcosta.compose-destinations:core:$destinationsVersion")
+    ksp("io.github.raamcosta.compose-destinations:ksp:$destinationsVersion")
 }
 
 kapt {
