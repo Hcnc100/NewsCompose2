@@ -26,10 +26,11 @@ import com.valentinilk.shimmer.shimmer
 @Composable
 fun NewsItem(
     newsItem: NewsData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    clickItem: () -> Unit
 ) {
 
-    Card(onClick = { /*TODO*/ }, shape = RoundedCornerShape(10.dp), modifier = modifier) {
+    Card(onClick = clickItem, shape = RoundedCornerShape(10.dp), modifier = modifier) {
         Box(
             contentAlignment = Alignment.BottomCenter
         ) {
@@ -50,7 +51,8 @@ fun NewsItem(
                     .background(
                         Color.Black.copy(alpha = 0.5F)
                     )
-                    .padding(5.dp)
+                    .padding(10.dp)
+                    .fillMaxWidth()
             )
         }
     }

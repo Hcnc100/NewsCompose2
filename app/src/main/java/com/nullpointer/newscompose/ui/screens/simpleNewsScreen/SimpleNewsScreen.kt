@@ -3,6 +3,7 @@ package com.nullpointer.newscompose.ui.screens.simpleNewsScreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,8 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nullpointer.newscompose.model.data.NewsData
 import com.nullpointer.newscompose.navigation.graphs.HomeNavGraph
+import com.nullpointer.newscompose.navigation.interfaces.ActionsRootNavigation
+import com.nullpointer.newscompose.ui.screens.destinations.WebViewScreenDestination
 import com.nullpointer.newscompose.ui.screens.simpleNewsScreen.viewModel.NewsViewModel
 import com.nullpointer.newscompose.ui.widgets.ConcatenateIndicator
+import com.nullpointer.newscompose.ui.widgets.IndicatorNumberSize
 import com.nullpointer.newscompose.ui.widgets.NewsItem
 import com.ramcosta.composedestinations.annotation.Destination
 
@@ -45,7 +49,8 @@ import com.ramcosta.composedestinations.annotation.Destination
 @Composable
 fun SimpleNewsScreen(
     newsViewModel: NewsViewModel,
-    lazyListState: LazyListState = rememberLazyListState()
+    lazyListState: LazyListState = rememberLazyListState(),
+    actionsRootNavigation: ActionsRootNavigation
 ) {
 
     val newsList by newsViewModel.newsList.collectAsState()
@@ -72,15 +77,18 @@ fun SimpleNewsScreen(
         }
     }
 
-    Scaffold {
+    Scaffold { paddingValues ->
         NewsListComposable(
             isLoading = isLoading,
             newsList = newsList,
             pullRefreshState = pullRefreshState,
             lazyListState = lazyListState,
             isConcatenate = isConcatenate,
+            clickNews = {
+                actionsRootNavigation.navigateTo(WebViewScreenDestination(it))
+            },
             modifier = Modifier
-                .padding(it)
+                .padding(paddingValues)
                 .fillMaxSize()
                 .pullRefresh(state = pullRefreshState)
         )
@@ -96,7 +104,8 @@ fun NewsListComposable(
     pullRefreshState: PullRefreshState,
     modifier: Modifier,
     lazyListState: LazyListState,
-    isConcatenate: Boolean
+    isConcatenate: Boolean,
+    clickNews: (NewsData) -> Unit
 ) {
     Box(
         modifier = modifier.then(
@@ -111,6 +120,7 @@ fun NewsListComposable(
                 newsList = newsList,
                 lazyListState = lazyListState,
                 isConcatenate = isConcatenate,
+                clickNews = clickNews
             )
 
         }
@@ -126,12 +136,14 @@ fun NewsListComposable(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListNews(
     newsList: List<NewsData>,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
-    isConcatenate: Boolean
+    isConcatenate: Boolean,
+    clickNews: (NewsData) -> Unit
 ) {
 
     Box(modifier = modifier) {
@@ -140,8 +152,14 @@ fun ListNews(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             contentPadding = PaddingValues(all = 10.dp),
         ) {
-            items(newsList, key = { it.newsId }, contentType = { "New" }) { news ->
-                NewsItem(newsItem = news)
+            stickyHeader {
+                IndicatorNumberSize(count = newsList.size)
+            }
+            items(
+                newsList, key = { it.newsId },
+                contentType = { "New" },
+            ) { news ->
+                NewsItem(newsItem = news, clickItem = { clickNews(news) })
             }
         }
 

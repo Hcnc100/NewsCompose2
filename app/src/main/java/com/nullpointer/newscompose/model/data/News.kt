@@ -2,9 +2,11 @@ package com.nullpointer.newscompose.model.data
 
 import com.nullpointer.newscompose.model.api.news.Article
 import com.nullpointer.newscompose.model.entity.NewsEntity
+import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
 import java.util.UUID
 
+@Serializable
 data class NewsData(
     val newsId:String,
     val dateTime:Long,
@@ -16,7 +18,7 @@ data class NewsData(
     companion object{
         fun fromNewsEntity(newsEntity: NewsEntity): NewsData {
             return NewsData(
-                 title = newsEntity.title,
+                title = newsEntity.title,
                 newsId = newsEntity.newsId,
                 dateTime = newsEntity.dateCreate,
                 description =  newsEntity.description,
@@ -24,7 +26,6 @@ data class NewsData(
                 url = newsEntity.url
             )
         }
-
 
 
         fun fromArticleResponse(article: Article, simpleDateFormat: SimpleDateFormat):NewsData{

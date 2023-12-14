@@ -3,6 +3,7 @@ package com.nullpointer.newscompose.ui.screens.roomNewsScreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -36,8 +37,11 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.nullpointer.newscompose.model.data.NewsData
 import com.nullpointer.newscompose.navigation.graphs.HomeNavGraph
+import com.nullpointer.newscompose.navigation.interfaces.ActionsRootNavigation
+import com.nullpointer.newscompose.ui.screens.destinations.WebViewScreenDestination
 import com.nullpointer.newscompose.ui.screens.simpleNewsScreen.viewModel.NewsViewModel
 import com.nullpointer.newscompose.ui.widgets.ConcatenateIndicator
+import com.nullpointer.newscompose.ui.widgets.IndicatorNumberSize
 import com.nullpointer.newscompose.ui.widgets.NewItemShimmer
 import com.nullpointer.newscompose.ui.widgets.NewsItem
 import com.ramcosta.composedestinations.annotation.Destination
@@ -51,7 +55,8 @@ import com.valentinilk.shimmer.rememberShimmer
 @Composable
 fun RoomNewsScreen(
     newsViewModel: NewsViewModel,
-    lazyListState: LazyListState = rememberLazyListState()
+    actionsRootNavigation: ActionsRootNavigation,
+    lazyListState: LazyListState = rememberLazyListState(),
 ) {
 
     val newsListPaging = newsViewModel.newsListPagingRoom.collectAsLazyPagingItems()
@@ -77,7 +82,7 @@ fun RoomNewsScreen(
         }
     }
 
-    Scaffold {
+    Scaffold { paddingValues ->
 
         ContainerPadding(
             isLoading = isLoading,
@@ -85,8 +90,11 @@ fun RoomNewsScreen(
             lazyListState = lazyListState,
             isConcatenate = isConcatenate,
             pullRefreshState = refreshState,
+            clickNews = {
+                actionsRootNavigation.navigateTo(WebViewScreenDestination(it))
+            },
             modifier = Modifier
-                .padding(it)
+                .padding(paddingValues)
                 .fillMaxSize()
                 .pullRefresh(refreshState)
         )
@@ -104,6 +112,7 @@ fun ContainerPadding(
     modifier: Modifier = Modifier,
     lazyPagingItems: LazyPagingItems<NewsData>,
     pullRefreshState: PullRefreshState,
+    clickNews: (NewsData) -> Unit
 ) {
 
     Box(
@@ -120,7 +129,8 @@ fun ContainerPadding(
             else -> ListNewsPaging(
                 lazyListState = lazyListState,
                 lazyPagingItems = lazyPagingItems,
-                isConcatenate = isConcatenate
+                isConcatenate = isConcatenate,
+                clickNews = clickNews
             )
         }
 
@@ -132,12 +142,14 @@ fun ContainerPadding(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListNewsPaging(
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
     lazyPagingItems: LazyPagingItems<NewsData>,
-    isConcatenate: Boolean
+    isConcatenate: Boolean,
+    clickNews: (NewsData) -> Unit
 ) {
 
     val shimmer = rememberShimmer(shimmerBounds = ShimmerBounds.View)
@@ -151,6 +163,10 @@ fun ListNewsPaging(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 contentPadding = PaddingValues(10.dp)
             ) {
+                stickyHeader {
+                    IndicatorNumberSize(count = lazyPagingItems.itemCount)
+                }
+
                 items(
                     count = lazyPagingItems.itemCount,
                     key = lazyPagingItems.itemKey { it.newsId },
@@ -162,7 +178,7 @@ fun ListNewsPaging(
                     if (currentNews == null) {
                         NewItemShimmer(shimmer = shimmer)
                     } else {
-                        NewsItem(newsItem = currentNews)
+                        NewsItem(newsItem = currentNews, clickItem = { clickNews(currentNews) })
                     }
                 }
             }

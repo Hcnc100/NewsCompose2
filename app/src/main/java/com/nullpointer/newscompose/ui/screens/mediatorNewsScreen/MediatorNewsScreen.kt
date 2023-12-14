@@ -4,13 +4,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -34,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -43,8 +39,11 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.nullpointer.newscompose.model.data.NewsData
 import com.nullpointer.newscompose.navigation.graphs.HomeNavGraph
+import com.nullpointer.newscompose.navigation.interfaces.ActionsRootNavigation
+import com.nullpointer.newscompose.ui.screens.destinations.WebViewScreenDestination
 import com.nullpointer.newscompose.ui.screens.simpleNewsScreen.viewModel.NewsViewModel
 import com.nullpointer.newscompose.ui.widgets.ConcatenateIndicator
+import com.nullpointer.newscompose.ui.widgets.IndicatorNumberSize
 import com.nullpointer.newscompose.ui.widgets.NewItemShimmer
 import com.nullpointer.newscompose.ui.widgets.NewsItem
 import com.ramcosta.composedestinations.annotation.Destination
@@ -61,7 +60,8 @@ import kotlinx.coroutines.flow.map
 @Composable
 fun MediatorNewsScreen(
     newsViewModel: NewsViewModel,
-    lazyListState: LazyListState = rememberLazyListState()
+    actionsRootNavigation: ActionsRootNavigation,
+    lazyListState: LazyListState = rememberLazyListState(),
 ) {
 
     val newsListPaging = newsViewModel.newsListPagingMediator.collectAsLazyPagingItems()
@@ -105,7 +105,7 @@ fun MediatorNewsScreen(
         }
     )
 
-    Scaffold {
+    Scaffold { paddingValues ->
 
         ContainerPadding(
             isLoading = isLoading,
@@ -113,8 +113,9 @@ fun MediatorNewsScreen(
             lazyListState = lazyListState,
             isConcatenate = isConcatenate,
             pullRefreshState = refreshState,
+            clickNew = { actionsRootNavigation.navigateTo(WebViewScreenDestination(it)) },
             modifier = Modifier
-                .padding(it)
+                .padding(paddingValues)
                 .fillMaxSize()
                 .pullRefresh(refreshState)
         )
@@ -132,6 +133,7 @@ fun ContainerPadding(
     modifier: Modifier = Modifier,
     lazyPagingItems: LazyPagingItems<NewsData>,
     pullRefreshState: PullRefreshState,
+    clickNew: (NewsData) -> Unit
 ) {
     Box(
         modifier = modifier.then(
@@ -146,7 +148,8 @@ fun ContainerPadding(
             else -> ListNewsPaging(
                 lazyListState = lazyListState,
                 lazyPagingItems = lazyPagingItems,
-                isConcatenate = isConcatenate
+                isConcatenate = isConcatenate,
+                clickNew = clickNew
             )
         }
 
@@ -164,7 +167,8 @@ fun ListNewsPaging(
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
     lazyPagingItems: LazyPagingItems<NewsData>,
-    isConcatenate: Boolean
+    isConcatenate: Boolean,
+    clickNew: (NewsData) -> Unit
 ) {
 
     val shimmer = rememberShimmer(shimmerBounds = ShimmerBounds.View)
@@ -178,15 +182,7 @@ fun ListNewsPaging(
         ) {
 
             stickyHeader {
-                Box(
-                    modifier = Modifier
-                        .background(Color.White)
-                        .fillMaxWidth()
-                        .height(40.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Text(text = "Numero de elementos actuales ${lazyPagingItems.itemCount}")
-                }
+                IndicatorNumberSize(count = lazyPagingItems.itemCount)
             }
 
             items(
@@ -200,7 +196,9 @@ fun ListNewsPaging(
                 if (currentNews == null) {
                     NewItemShimmer(shimmer = shimmer)
                 } else {
-                    NewsItem(newsItem = currentNews)
+                    NewsItem(newsItem = currentNews, clickItem = {
+                        clickNew(currentNews)
+                    })
                 }
             }
         }
